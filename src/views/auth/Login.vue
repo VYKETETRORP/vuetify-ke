@@ -1,16 +1,47 @@
-<template class="form">
-  <div class="app"  >
+<template>
+  <div>
     
     <div class="text-center">
-      <h2 class="indigo--text">Sign In</h2>
+      <h2 class="indigo--text">Register</h2>
     </div>
     
     <v-divider class="ma-5"/>
 
-    <v-form  @submit.prevent="onSubmit" lazy-validation ref="form" >
-
+    <v-form @submit.prevent="register" lazy-validation ref="form">
+    <v-alert color="red" v-if="errors?.message" class="white--text text-center mb-8" elevation="3">{{errors?.message}}</v-alert>
       <v-card-text>
-        <v-alert color="red" v-if="errors?.message" class="white--text text-center mb-8" elevation="3">{{errors?.message}}</v-alert>
+        <v-row>
+          <v-col lg="6" cols="6">    
+            <v-text-field 
+              type="text"
+              label="First Name"
+              placeholder="First Name"
+              outlined
+              v-model="form.first_name"
+              :rules="[v => !!v || 'Please enter first name']"
+            />
+          </v-col>
+          <v-col lg="6" cols="6">
+            <v-text-field
+              type="text"
+              label="Last Name"
+              placeholder="Last Name"
+              outlined
+              v-model="form.last_name"
+              :rules="[v => !!v || 'Please enter last name']"
+            />
+          </v-col>
+        </v-row>
+        
+        <v-text-field
+          type="text"
+          label="Username"
+          placeholder="Username"
+          prepend-inner-icon="mdi-account"
+          outlined
+          v-model="form.name"
+          :rules="[v => !!v || 'Please enter username']"
+        />
         <v-text-field
           type="email"
           label="Email"
@@ -20,7 +51,23 @@
           v-model="form.email"
           :rules="[v => !!v || 'Please enter email']"
         />
-        <!-- <p v-if="errors.email">{{errors.email[0]}}</p> -->
+        <v-text-field
+          type="number"
+          label="Phone Number"
+          placeholder="Phone Number"
+          prepend-inner-icon="mdi-phone"
+          outlined
+          v-model="form.phone_number"
+          :rules="[v => !!v || 'Please enter phone number']"
+        />
+        <v-select
+          v-model="form.gender"
+          :items="genders"
+          label="Gender"
+          prepend-inner-icon="mdi-account"
+          outlined
+          :rules="[v => !!v || 'Please select gender']"
+        ></v-select>
         <v-text-field
           v-model="form.password"
           :type="passwordShow ? 'text' : 'password'"
@@ -32,24 +79,29 @@
           outlined
           :rules="[v => !!v || 'Please enter password']"
         />
-        <v-switch label="Remember me" color="indigo"></v-switch>
+        
+        <v-text-field
+          v-model="form.password_confirmation"
+          :type="passwordShow ? 'text' : 'password'"
+          label="Re-type Password"
+          placeholder="Re-type Password"
+          prepend-inner-icon="mdi-lock"
+          :append-icon="confirmPasswordShow ? 'mdi-eye' : 'mdi-eye-off'"
+          @click:append="confirmPasswordShow = !confirmPasswordShow"
+          :rules="[v => !!v || 'Please enter password confirmation']"
+          outlined
+        />
+        
       </v-card-text>
-
       <v-card-actions class="justify-center">
-        <v-btn type="submit" color="indigo">
-          <span class="white--text px-5">Login</span>
+        <v-btn color="indigo" type="submit">
+          <span class="white--text px-8">Register</span>
         </v-btn>
       </v-card-actions>
-
     </v-form>
-
     <v-card-actions>
-      <a href="/register" class="black--text d-flex">  Not yet have account?</a>
-
       <v-spacer/>
-
-      <a href="/forget" class="black--text d-flex">  Forgot password?</a>
-      
+      <a href="/guest" class="black--text d-flex">Back to login</a>
     </v-card-actions>
     <br><br>
     <p class="ml-5">By continuing, you agree to Plant Helper's <a href="#" style="color:black;">Policy</a> and <a style="color:black;" href="#">Terms of Use</a></p>
@@ -61,57 +113,41 @@ export default {
   data() {
     return {
       passwordShow: 0,
+      confirmPasswordShow: 0,
       form: {
+        first_name: null,
+        last_name: null,
+        name: null,
         email: null,
-        password: null
+        phone_number: null,
+        gender: null,
+        password: null,
+        password_confirmation: null
       },
-      errors: [],
+      genders: [
+        'male',
+        'female',
+        'other'
+      ],
+       errors: [],
     }
   },
   methods: {
-    onSubmit() {
+    register() {
       if(this.$refs.form.validate()) {
-        this.axios.post('http://127.0.0.1:8000/api/login', this.form)
+        console.log(this.form);
+        this.axios.post('http://127.0.0.1:8000/api/register', this.form)
         .then(response => {
-          console.log(response);
-          window.localStorage.setItem("accessToken", response.data.access_token);
-          window.localStorage.setItem("refreshToken", response.data.refresh_token);
-          window.localStorage.setItem("authenticated", 1);
-          window.localStorage.setItem('isTokenRefreshing', 0);
           this.$router.push({name: 'home'});
         })
-        .catch(({ response }) => {
+        .catch(({response})=> {
           this.errors = response.data;
         })
         .finally(() => {
-          
+          console.log('xD');
         })
       }
-    },
-  },
-
+    }
+  }
 }
 </script>
-
-<style>
-.app {
-  
-  background-color: rgb(255, 244, 244); /* Fallback color */
-  background-color: rgba(255, 255, 255, 0.7); /*Black w/opacity/see-through */
-
-  font-weight: bold;
-  border: 1px solid #f1f1f1;
-  position: absolute;
-  top: 840%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9;
-  width: 100%;
- 
-  text-align: center;
-
-
-
-}
-
-</style>
