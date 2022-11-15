@@ -136,9 +136,9 @@ export default {
     register() {
       if(this.$refs.form.validate()) {
         console.log(this.form);
-        this.axios.post('http://login.info/api/register', this.form)
+        this.axios.post('http://127.0.0.1:8000/api/register', this.form)
         .then(response => {
-          this.$router.push({name: 'login'});
+          this.$router.push({name: 'home'});
         })
         .catch(({response})=> {
           this.errors = response.data;

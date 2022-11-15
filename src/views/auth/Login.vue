@@ -71,7 +71,7 @@ export default {
   methods: {
     onSubmit() {
       if(this.$refs.form.validate()) {
-        this.axios.post('http://login.info/api/login', this.form)
+        this.axios.post('http://127.0.0.1:8000/api/login', this.form)
         .then(response => {
           console.log(response);
           window.localStorage.setItem("accessToken", response.data.access_token);
